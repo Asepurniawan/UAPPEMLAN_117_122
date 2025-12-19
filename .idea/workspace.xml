@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="9996014e-7cdd-4305-b6c6-f7fd70b2ab43" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/DataManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/DataManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/Employee.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LogoGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/LogoGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SupermarketApp.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UAPPEMLAN_117_122/DataManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UAPPEMLAN_117_122/Employee.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UAPPEMLAN_117_122/LogoGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UAPPEMLAN_117_122/Product.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UAPPEMLAN_117_122/SupermarketApp.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "gilang-git"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Asepurniawan/UAPPEMLAN_117_122.git",
+    "accountId": "a0f5880b-e42d-4efb-953e-7e7ef82ad1f1"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="37A7SBYWWzT3AekaZu0ECbUUCTB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Kuliah/pemrograman lanjut ssem 3/modul 999"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9996014e-7cdd-4305-b6c6-f7fd70b2ab43" name="Changes" comment="" />
+      <created>1766334020186</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1766334020186</updated>
+    </task>
+    <servers />
+  </component>
+</project>
