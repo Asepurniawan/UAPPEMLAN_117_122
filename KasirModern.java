@@ -172,64 +172,129 @@ JPanel loginPage() {
 
     // ================= KASIR =================
     JPanel kasirPage() {
-        JPanel wrap = cardPanel(0,0);
-        wrap.setLayout(new BorderLayout());
+    JPanel root = new JPanel(new BorderLayout(16,16));
+    root.setBackground(BG);
+    root.setBorder(new EmptyBorder(16,16,16,16));
 
-        mdlCart = new DefaultTableModel(
-                new String[]{"Produk","Qty","Subtotal"},0);
-        tblCart = new JTable(mdlCart);
+    // ===== HEADER =====
+    JLabel title = new JLabel("🧾 Transaksi Kasir");
+    title.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
-        lblTotal = new JLabel("Rp 0");
-        lblTotal.setFont(new Font("Segoe UI",Font.BOLD,22));
+    JPanel header = new JPanel(new BorderLayout());
+    header.setOpaque(false);
+    header.add(title, BorderLayout.WEST);
+    header.add(lblJam, BorderLayout.EAST);
 
-        JButton bayar = btn(GREEN,"Bayar");
-        bayar.addActionListener(e -> bayar());
+    // ===== TABLE =====
+    mdlCart = new DefaultTableModel(
+            new String[]{"Produk","Qty","Subtotal"},0);
+    tblCart = styledTable(mdlCart);
 
-        wrap.add(new JScrollPane(tblCart),BorderLayout.CENTER);
-        wrap.add(lblTotal,BorderLayout.SOUTH);
-        wrap.add(bayar,BorderLayout.NORTH);
-        return wrap;
-    }
+    JScrollPane scroll = new JScrollPane(tblCart);
+    scroll.setBorder(new LineBorder(BORDER));
+
+    // ===== FOOTER =====
+    lblTotal = new JLabel("Rp 0");
+    lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 22));
+
+    JButton bayar = btn(GREEN,"💳 Bayar");
+    bayar.setPreferredSize(new Dimension(140,42));
+    bayar.addActionListener(e -> bayar());
+
+    JPanel footer = new JPanel(new BorderLayout());
+    footer.setOpaque(false);
+    footer.add(lblTotal, BorderLayout.WEST);
+    footer.add(bayar, BorderLayout.EAST);
+
+    root.add(header,BorderLayout.NORTH);
+    root.add(scroll,BorderLayout.CENTER);
+    root.add(footer,BorderLayout.SOUTH);
+    return root;
+}
+
 
     // ================= BARANG =================
     JPanel barangPage() {
-        JPanel wrap = cardPanel(0,0);
-        wrap.setLayout(new BorderLayout());
+    JPanel root = new JPanel(new BorderLayout(16,16));
+    root.setBackground(BG);
+    root.setBorder(new EmptyBorder(16,16,16,16));
 
-        mdlProduk = new DefaultTableModel(
-                new String[]{"Nama","Harga"},0);
-        tblProduk = new JTable(mdlProduk);
+    // ===== HEADER =====
+    JLabel title = new JLabel("📦 Manajemen Produk");
+    title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+
+    JPanel header = new JPanel(new BorderLayout());
+    header.setOpaque(false);
+    header.add(title, BorderLayout.WEST);
+
+    // ===== TABLE =====
+    mdlProduk = new DefaultTableModel(
+            new String[]{"Nama Produk","Harga"},0);
+    tblProduk = styledTable(mdlProduk);
+    refreshProduk();
+
+    JScrollPane scroll = new JScrollPane(tblProduk);
+    scroll.setBorder(new LineBorder(BORDER));
+
+    // ===== ACTION BUTTON =====
+    JButton add = btn(PRIMARY,"➕ Tambah");
+    JButton edit = btn(YELLOW,"✏ Edit");
+    JButton del = btn(RED,"🗑 Hapus");
+    JButton cartBtn = btn(GREEN,"🛒 Ke Kasir");
+
+    add.addActionListener(e -> tambahProduk());
+    del.addActionListener(e -> hapusProduk());
+    cartBtn.addActionListener(e -> tambahKeranjang());
+
+    edit.addActionListener(e -> {
+        int r = tblProduk.getSelectedRow();
+        if(r==-1) return;
+        Product p = products.get(r);
+        String nama = JOptionPane.showInputDialog(this,"Nama Produk",p.nama);
+        int harga = Integer.parseInt(
+                JOptionPane.showInputDialog(this,"Harga",p.harga));
+        p.nama = nama;
+        p.harga = harga;
         refreshProduk();
+        simpanProdukCSV();
+    });
 
-        JButton add = btn(PRIMARY,"Tambah");
-        JButton del = btn(RED,"Hapus");
-        JButton cartBtn = btn(GREEN,"Ke Kasir");
+    JPanel action = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,0));
+    action.setOpaque(false);
+    action.add(add);
+    action.add(edit);
+    action.add(del);
+    action.add(cartBtn);
 
-        add.addActionListener(e -> tambahProduk());
-        del.addActionListener(e -> hapusProduk());
-        cartBtn.addActionListener(e -> tambahKeranjang());
+    root.add(header,BorderLayout.NORTH);
+    root.add(scroll,BorderLayout.CENTER);
+    root.add(action,BorderLayout.SOUTH);
+    return root;
+}
 
-        JPanel p = new JPanel();
-        p.add(add); p.add(del); p.add(cartBtn);
-
-        wrap.add(new JScrollPane(tblProduk),BorderLayout.CENTER);
-        wrap.add(p,BorderLayout.SOUTH);
-        return wrap;
-    }
 
     // ================= LAPORAN =================
-    JPanel laporanPage() {
-        JPanel wrap = cardPanel(0,0);
-        wrap.setLayout(new BorderLayout());
+JPanel laporanPage() {
+    JPanel root = new JPanel(new BorderLayout(16,16));
+    root.setBackground(BG);
+    root.setBorder(new EmptyBorder(16,16,16,16));
 
-        mdlReport = new DefaultTableModel(
-                new String[]{"Tanggal","Total","Metode","Bayar","Kembali"},0);
-        tblReport = new JTable(mdlReport);
-        loadLaporanCSV();
+    JLabel title = new JLabel("📑 Laporan Transaksi");
+    title.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
-        wrap.add(new JScrollPane(tblReport),BorderLayout.CENTER);
-        return wrap;
-    }
+    mdlReport = new DefaultTableModel(
+            new String[]{"Tanggal","Total","Metode","Bayar","Kembali"},0);
+    tblReport = styledTable(mdlReport);
+    loadLaporanCSV();
+
+    JScrollPane scroll = new JScrollPane(tblReport);
+    scroll.setBorder(new LineBorder(BORDER));
+
+    root.add(title,BorderLayout.NORTH);
+    root.add(scroll,BorderLayout.CENTER);
+    return root;
+}
+
 
     // ================= LOGIC =================
     void tambahProduk(){
@@ -371,4 +436,16 @@ JPanel loginPage() {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(KasirModern::new);
     }
+    // ================= TABLE STYLE =================
+JTable styledTable(DefaultTableModel mdl){
+    JTable t = new JTable(mdl);
+    t.setRowHeight(32);
+    t.setFont(FONT);
+    t.getTableHeader().setFont(new Font("Segoe UI",Font.BOLD,13));
+    t.getTableHeader().setBackground(new Color(248,250,252));
+    t.getTableHeader().setBorder(new LineBorder(BORDER));
+    t.setGridColor(BORDER);
+    return t;
+}
+
 }
