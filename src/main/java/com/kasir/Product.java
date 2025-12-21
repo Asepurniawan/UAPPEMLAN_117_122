@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+package com.kasir;
+>>>>>>> 382eb3f (Gilang dan Asep Update maven)
 
 public class Product {
     private String id;

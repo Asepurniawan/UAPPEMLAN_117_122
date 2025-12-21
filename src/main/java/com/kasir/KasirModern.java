@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+package com.kasir;
+
+>>>>>>> 382eb3f (Gilang dan Asep Update maven)
 import java.awt.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -56,12 +61,17 @@ public class KasirModern extends JFrame {
 
         new javax.swing.Timer(1000, e -> {
             lblJam.setText(new SimpleDateFormat(
+<<<<<<< HEAD
                 "EEEE, dd/MM/yyyy  HH:mm:ss"
+=======
+                    "EEEE, dd/MM/yyyy  HH:mm:ss"
+>>>>>>> 382eb3f (Gilang dan Asep Update maven)
             ).format(new Date()));
         }).start();
     }
 
     // ================= LOGIN =================
+<<<<<<< HEAD
 JPanel loginPage() {
     JPanel root = new JPanel(new GridBagLayout());
     root.setBackground(BG);
@@ -132,6 +142,78 @@ JPanel loginPage() {
     root.add(card);
     return root;
 }
+=======
+    JPanel loginPage() {
+        JPanel root = new JPanel(new GridBagLayout());
+        root.setBackground(BG);
+
+        JPanel card = cardPanel(420,520);
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+        // ===== LOGO =====
+        JLabel icon = new JLabel("🛒", SwingConstants.CENTER);
+        icon.setFont(new Font("Segoe UI", Font.PLAIN, 72));
+        icon.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("POS MINIMARKET");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Login Kasir");
+        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        subtitle.setForeground(new Color(100,116,139));
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // ===== INPUT =====
+        JTextField user = inputField("Username");
+        JPasswordField pass = passwordField();
+
+        // ===== BUTTON =====
+        JButton login = btn(PRIMARY, "MASUK");
+        login.setAlignmentX(Component.CENTER_ALIGNMENT);
+        login.setMaximumSize(new Dimension(Integer.MAX_VALUE, 54));
+
+        login.addActionListener(e -> {
+            if (user.getText().equals("kasir") &&
+                    new String(pass.getPassword()).equals("123")) {
+                setContentPane(mainPage());
+                revalidate();
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Username atau Password salah",
+                        "Login Gagal",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+        // ===== FOOTER =====
+        JLabel footer = new JLabel("© 2025 POS Kasir Modern");
+        footer.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        footer.setForeground(new Color(148,163,184));
+        footer.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // ===== LAYOUT =====
+        card.add(Box.createVerticalStrut(10));
+        card.add(icon);
+        card.add(Box.createVerticalStrut(12));
+        card.add(title);
+        card.add(Box.createVerticalStrut(4));
+        card.add(subtitle);
+        card.add(Box.createVerticalStrut(30));
+        card.add(user);
+        card.add(Box.createVerticalStrut(16));
+        card.add(pass);
+        card.add(Box.createVerticalStrut(28));
+        card.add(login);
+        card.add(Box.createVerticalGlue());
+        card.add(footer);
+
+        root.add(card);
+        return root;
+    }
+>>>>>>> 382eb3f (Gilang dan Asep Update maven)
 
     // ================= MAIN =================
     JPanel mainPage() {
@@ -172,6 +254,7 @@ JPanel loginPage() {
 
     // ================= KASIR =================
     JPanel kasirPage() {
+<<<<<<< HEAD
     JPanel root = new JPanel(new BorderLayout(16,16));
     root.setBackground(BG);
     root.setBorder(new EmptyBorder(16,16,16,16));
@@ -211,10 +294,52 @@ JPanel loginPage() {
     root.add(footer,BorderLayout.SOUTH);
     return root;
 }
+=======
+        JPanel root = new JPanel(new BorderLayout(16,16));
+        root.setBackground(BG);
+        root.setBorder(new EmptyBorder(16,16,16,16));
+
+        // ===== HEADER =====
+        JLabel title = new JLabel("🧾 Transaksi Kasir");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+        header.add(title, BorderLayout.WEST);
+        header.add(lblJam, BorderLayout.EAST);
+
+        // ===== TABLE =====
+        mdlCart = new DefaultTableModel(
+                new String[]{"Produk","Qty","Subtotal"},0);
+        tblCart = styledTable(mdlCart);
+
+        JScrollPane scroll = new JScrollPane(tblCart);
+        scroll.setBorder(new LineBorder(BORDER));
+
+        // ===== FOOTER =====
+        lblTotal = new JLabel("Rp 0");
+        lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 22));
+
+        JButton bayar = btn(GREEN,"💳 Bayar");
+        bayar.setPreferredSize(new Dimension(140,42));
+        bayar.addActionListener(e -> bayar());
+
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setOpaque(false);
+        footer.add(lblTotal, BorderLayout.WEST);
+        footer.add(bayar, BorderLayout.EAST);
+
+        root.add(header,BorderLayout.NORTH);
+        root.add(scroll,BorderLayout.CENTER);
+        root.add(footer,BorderLayout.SOUTH);
+        return root;
+    }
+>>>>>>> 382eb3f (Gilang dan Asep Update maven)
 
 
     // ================= BARANG =================
     JPanel barangPage() {
+<<<<<<< HEAD
     JPanel root = new JPanel(new BorderLayout(16,16));
     root.setBackground(BG);
     root.setBorder(new EmptyBorder(16,16,16,16));
@@ -294,6 +419,87 @@ JPanel laporanPage() {
     root.add(scroll,BorderLayout.CENTER);
     return root;
 }
+=======
+        JPanel root = new JPanel(new BorderLayout(16,16));
+        root.setBackground(BG);
+        root.setBorder(new EmptyBorder(16,16,16,16));
+
+        // ===== HEADER =====
+        JLabel title = new JLabel("📦 Manajemen Produk");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+        header.add(title, BorderLayout.WEST);
+
+        // ===== TABLE =====
+        mdlProduk = new DefaultTableModel(
+                new String[]{"Nama Produk","Harga"},0);
+        tblProduk = styledTable(mdlProduk);
+        refreshProduk();
+
+        JScrollPane scroll = new JScrollPane(tblProduk);
+        scroll.setBorder(new LineBorder(BORDER));
+
+        // ===== ACTION BUTTON =====
+        JButton add = btn(PRIMARY,"➕ Tambah");
+        JButton edit = btn(YELLOW,"✏ Edit");
+        JButton del = btn(RED,"🗑 Hapus");
+        JButton cartBtn = btn(GREEN,"🛒 Ke Kasir");
+
+        add.addActionListener(e -> tambahProduk());
+        del.addActionListener(e -> hapusProduk());
+        cartBtn.addActionListener(e -> tambahKeranjang());
+
+        edit.addActionListener(e -> {
+            int r = tblProduk.getSelectedRow();
+            if(r==-1) return;
+            Product p = products.get(r);
+            String nama = JOptionPane.showInputDialog(this,"Nama Produk",p.nama);
+            int harga = Integer.parseInt(
+                    JOptionPane.showInputDialog(this,"Harga",p.harga));
+            p.nama = nama;
+            p.harga = harga;
+            refreshProduk();
+            simpanProdukCSV();
+        });
+
+        JPanel action = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,0));
+        action.setOpaque(false);
+        action.add(add);
+        action.add(edit);
+        action.add(del);
+        action.add(cartBtn);
+
+        root.add(header,BorderLayout.NORTH);
+        root.add(scroll,BorderLayout.CENTER);
+        root.add(action,BorderLayout.SOUTH);
+        return root;
+    }
+
+
+    // ================= LAPORAN =================
+    JPanel laporanPage() {
+        JPanel root = new JPanel(new BorderLayout(16,16));
+        root.setBackground(BG);
+        root.setBorder(new EmptyBorder(16,16,16,16));
+
+        JLabel title = new JLabel("📑 Laporan Transaksi");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+
+        mdlReport = new DefaultTableModel(
+                new String[]{"Tanggal","Total","Metode","Bayar","Kembali"},0);
+        tblReport = styledTable(mdlReport);
+        loadLaporanCSV();
+
+        JScrollPane scroll = new JScrollPane(tblReport);
+        scroll.setBorder(new LineBorder(BORDER));
+
+        root.add(title,BorderLayout.NORTH);
+        root.add(scroll,BorderLayout.CENTER);
+        return root;
+    }
+>>>>>>> 382eb3f (Gilang dan Asep Update maven)
 
 
     // ================= LOGIC =================
@@ -437,6 +643,7 @@ JPanel laporanPage() {
         SwingUtilities.invokeLater(KasirModern::new);
     }
     // ================= TABLE STYLE =================
+<<<<<<< HEAD
 JTable styledTable(DefaultTableModel mdl){
     JTable t = new JTable(mdl);
     t.setRowHeight(32);
@@ -449,3 +656,17 @@ JTable styledTable(DefaultTableModel mdl){
 }
 
 }
+=======
+    JTable styledTable(DefaultTableModel mdl){
+        JTable t = new JTable(mdl);
+        t.setRowHeight(32);
+        t.setFont(FONT);
+        t.getTableHeader().setFont(new Font("Segoe UI",Font.BOLD,13));
+        t.getTableHeader().setBackground(new Color(248,250,252));
+        t.getTableHeader().setBorder(new LineBorder(BORDER));
+        t.setGridColor(BORDER);
+        return t;
+    }
+
+}
+>>>>>>> 382eb3f (Gilang dan Asep Update maven)
