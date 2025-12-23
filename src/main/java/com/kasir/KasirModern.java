@@ -1,429 +1,664 @@
-package com.kasir;
+package com.kasir; // Boleh dihapus jika tidak pakai package
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.text.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
 
 public class KasirModern extends JFrame {
 
-    // ===== FILE =====
-    String FILE_PRODUK = "produk.csv";
-    String FILE_LAPORAN = "laporan.csv";
+    // --- 1. KONFIGURASI DAN DATA ---
+    private final String FILE_PRODUK = "produk.csv";
+    private final String FILE_LAPORAN = "laporan.csv";
+    private final String FILE_EMPLOYEE = "employee.csv";
 
-    // ===== THEME =====
-    Color BG = new Color(241,245,249);
-    Color SIDEBAR = new Color(15,23,42);
-    Color CARD = Color.WHITE;
-    Color PRIMARY = new Color(37,99,235);
-    Color GREEN = new Color(34,197,94);
-    Color RED = new Color(239,68,68);
-    Color YELLOW = new Color(234,179,8);
-    Color BORDER = new Color(226,232,240);
+    // Warna Modern (Palette UI)
+    private final Color COL_BG_MAIN    = new Color(241, 245, 249);
+    private final Color COL_SIDEBAR    = new Color(15, 23, 42);
+    private final Color COL_ACCENT     = new Color(59, 130, 246); // Biru
+    private final Color COL_SUCCESS    = new Color(34, 197, 94);  // Hijau
+    private final Color COL_DANGER     = new Color(239, 68, 68);  // Merah
 
-    Font FONT = new Font("Segoe UI", Font.PLAIN, 14);
+    // Font
+    private final Font FONT_UI = new Font("Segoe UI", Font.PLAIN, 14);
+    private final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
+    private final Font FONT_HEADER = new Font("Segoe UI", Font.BOLD, 22);
 
-    // ===== DATA =====
-    ArrayList<Product> products = new ArrayList<>();
-    ArrayList<CartItem> cart = new ArrayList<>();
+    // Data List
+    private ArrayList<Product> productList = new ArrayList<>();
+    private ArrayList<CartItem> cartList = new ArrayList<>();
+    private ArrayList<Employee> employeeList = new ArrayList<>();
 
-    // ===== UI =====
-    CardLayout contentLayout = new CardLayout();
-    JPanel content = new JPanel(contentLayout);
+    // Komponen UI Utama
+    private CardLayout cardLayout = new CardLayout();
+    private JPanel contentPanel = new JPanel(cardLayout);
+    
+    // Komponen Halaman Kasir
+    private JPanel panelProdukGrid;
+    private JTextField txtSearchKasir;
+    private JPanel panelCartItems;
+    private JLabel lblTotalBayar;
+    
+    // Komponen Halaman Admin
+    private DefaultTableModel modelProdukAdmin;
+    private JTextField txtSearchAdmin;
+    private DefaultTableModel modelLaporan;
 
-    JTable tblProduk, tblCart, tblReport;
-    DefaultTableModel mdlProduk, mdlCart, mdlReport;
-    JLabel lblTotal, lblJam;
-
-    // ===== CONSTRUCTOR =====
+    // --- 2. CONSTRUCTOR ---
     public KasirModern() {
-        setTitle("POS Kasir Minimarket");
-        setSize(1280, 760);
+        setTitle("Aplikasi Kasir Pro");
+        setSize(1366, 768); // Resolusi standar laptop
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setContentPane(loginPage());
+
+        // 1. Generate Data Dummy jika file kosong (Agar tidak blank saat pertama run)
+        initDummyData(); 
+
+        // 2. Load Data dari CSV
+        loadDataProduk();
+        loadDataEmployee();
+
+        // 3. Tampilkan Login Screen
+        setContentPane(initLoginScreen());
         setVisible(true);
-
-        loadProdukCSV();
-        startLiveClock();
     }
 
-    // ================= LIVE CLOCK =================
-    void startLiveClock() {
-        lblJam = new JLabel();
-        lblJam.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblJam.setForeground(new Color(100,116,139));
-
-        new Timer(1000, e ->
-            lblJam.setText(
-                new SimpleDateFormat("EEEE, dd/MM/yyyy  HH:mm:ss")
-                        .format(new Date())
-            )
-        ).start();
-    }
-
-    // ================= LOGIN =================
-    JPanel loginPage() {
-        JPanel root = new JPanel(new GridBagLayout());
-        root.setBackground(BG);
-
-        JPanel card = cardPanel(420, 520);
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-
-        JLabel icon = new JLabel("🛒", SwingConstants.CENTER);
-        icon.setFont(new Font("Segoe UI", Font.PLAIN, 72));
-        icon.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel title = new JLabel("POS MINIMARKET");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel subtitle = new JLabel("Login Kasir");
-        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        subtitle.setForeground(new Color(100,116,139));
-        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JTextField user = inputField("Username");
-        JPasswordField pass = passwordField();
-
-        JButton login = btn(PRIMARY, "MASUK");
-        login.setAlignmentX(Component.CENTER_ALIGNMENT);
-        login.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-
-        login.addActionListener(e -> {
-            if (user.getText().equals("kasir")
-                    && new String(pass.getPassword()).equals("123")) {
-                setContentPane(mainPage());
-                revalidate();
-            } else {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Username atau Password salah",
-                        "Login Gagal",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
-        });
-
-        card.add(icon);
-        card.add(Box.createVerticalStrut(10));
-        card.add(title);
-        card.add(subtitle);
-        card.add(Box.createVerticalStrut(30));
-        card.add(user);
-        card.add(Box.createVerticalStrut(12));
-        card.add(pass);
-        card.add(Box.createVerticalStrut(20));
-        card.add(login);
-
-        root.add(card);
-        return root;
-    }
-
-    // ================= MAIN =================
-    JPanel mainPage() {
-        JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(BG);
-
-        root.add(sidebar(), BorderLayout.WEST);
-
-        content.add(kasirPage(), "KASIR");
-        content.add(barangPage(), "BARANG");
-        content.add(laporanPage(), "LAPORAN");
-
-        root.add(content, BorderLayout.CENTER);
-        contentLayout.show(content, "KASIR");
-        return root;
-    }
-
-    // ================= SIDEBAR =================
-    JPanel sidebar() {
-        JPanel side = new JPanel();
-        side.setBackground(SIDEBAR);
-        side.setPreferredSize(new Dimension(220, 0));
-        side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
-
-        side.add(sideBtn("🧾 Transaksi", "KASIR"));
-        side.add(sideBtn("📦 Barang", "BARANG"));
-        side.add(sideBtn("📑 Laporan", "LAPORAN"));
-
-        return side;
-    }
-
-    JButton sideBtn(String text, String page) {
-        JButton b = new JButton(text);
-        b.setBackground(SIDEBAR);
-        b.setForeground(Color.WHITE);
-        b.setFocusPainted(false);
-        b.addActionListener(e -> contentLayout.show(content, page));
-        return b;
-    }
-
-    // ================= KASIR =================
-    JPanel kasirPage() {
-        JPanel root = new JPanel(new BorderLayout(16,16));
-        root.setBackground(BG);
-        root.setBorder(new EmptyBorder(16,16,16,16));
-
-        JPanel header = new JPanel(new BorderLayout());
-        header.setOpaque(false);
-
-        JLabel title = new JLabel("🧾 Transaksi Kasir");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
-
-        header.add(title, BorderLayout.WEST);
-        header.add(lblJam, BorderLayout.EAST);
-
-        mdlCart = new DefaultTableModel(
-                new String[]{"Produk","Qty","Subtotal"}, 0);
-        tblCart = styledTable(mdlCart);
-
-        JScrollPane scroll = new JScrollPane(tblCart);
-        scroll.setBorder(new LineBorder(BORDER));
-
-        lblTotal = new JLabel("Rp 0");
-        lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 22));
-
-        JButton bayar = btn(GREEN, "💳 Bayar");
-        bayar.addActionListener(e -> bayar());
-
-        JPanel footer = new JPanel(new BorderLayout());
-        footer.setOpaque(false);
-        footer.add(lblTotal, BorderLayout.WEST);
-        footer.add(bayar, BorderLayout.EAST);
-
-        root.add(header, BorderLayout.NORTH);
-        root.add(scroll, BorderLayout.CENTER);
-        root.add(footer, BorderLayout.SOUTH);
-        return root;
-    }
-
-    // ================= BARANG =================
-    JPanel barangPage() {
-        JPanel root = new JPanel(new BorderLayout(16,16));
-        root.setBackground(BG);
-        root.setBorder(new EmptyBorder(16,16,16,16));
-
-        JLabel title = new JLabel("📦 Manajemen Produk");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
-
-        mdlProduk = new DefaultTableModel(
-                new String[]{"Nama Produk","Harga"}, 0);
-        tblProduk = styledTable(mdlProduk);
-        refreshProduk();
-
-        JScrollPane scroll = new JScrollPane(tblProduk);
-        scroll.setBorder(new LineBorder(BORDER));
-
-        JButton add = btn(PRIMARY, "➕ Tambah");
-        JButton del = btn(RED, "🗑 Hapus");
-        JButton cartBtn = btn(GREEN, "🛒 Ke Kasir");
-
-        add.addActionListener(e -> tambahProduk());
-        del.addActionListener(e -> hapusProduk());
-        cartBtn.addActionListener(e -> tambahKeranjang());
-
-        JPanel action = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        action.setOpaque(false);
-        action.add(add);
-        action.add(del);
-        action.add(cartBtn);
-
-        root.add(title, BorderLayout.NORTH);
-        root.add(scroll, BorderLayout.CENTER);
-        root.add(action, BorderLayout.SOUTH);
-        return root;
-    }
-
-    // ================= LAPORAN =================
-    JPanel laporanPage() {
-        JPanel root = new JPanel(new BorderLayout(16,16));
-        root.setBackground(BG);
-        root.setBorder(new EmptyBorder(16,16,16,16));
-
-        JLabel title = new JLabel("📑 Laporan Transaksi");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
-
-        mdlReport = new DefaultTableModel(
-                new String[]{"Tanggal","Total","Metode","Bayar","Kembali"},0);
-        tblReport = styledTable(mdlReport);
-        loadLaporanCSV();
-
-        JScrollPane scroll = new JScrollPane(tblReport);
-        scroll.setBorder(new LineBorder(BORDER));
-
-        root.add(title, BorderLayout.NORTH);
-        root.add(scroll, BorderLayout.CENTER);
-        return root;
-    }
-
-    // ================= LOGIC =================
-    void tambahProduk() {
-        String nama = JOptionPane.showInputDialog(this,"Nama Produk");
-        int harga = Integer.parseInt(
-                JOptionPane.showInputDialog(this,"Harga"));
-        products.add(new Product(nama, harga));
-        refreshProduk();
-        simpanProdukCSV();
-    }
-
-    void hapusProduk() {
-        int r = tblProduk.getSelectedRow();
-        if (r == -1) return;
-        products.remove(r);
-        refreshProduk();
-        simpanProdukCSV();
-    }
-
-    void tambahKeranjang() {
-        int r = tblProduk.getSelectedRow();
-        if (r == -1) return;
-        int qty = Integer.parseInt(
-                JOptionPane.showInputDialog(this,"Jumlah"));
-        Product p = products.get(r);
-        cart.add(new CartItem(p.nama, qty, qty * p.harga));
-        mdlCart.addRow(new Object[]{p.nama, qty, qty * p.harga});
-        updateTotal();
-    }
-
-    void bayar() {
-        int total = getTotal();
-        if (total == 0) return;
-
-        int bayar = Integer.parseInt(
-                JOptionPane.showInputDialog(this,"Bayar"));
-        int kembali = bayar - total;
-
-        String tgl = new SimpleDateFormat("dd/MM/yyyy HH:mm")
-                .format(new Date());
-
-        mdlReport.addRow(
-                new Object[]{tgl, total, "Tunai", bayar, kembali});
-        simpanLaporanCSV(tgl, total, "Tunai", bayar, kembali);
-
-        cart.clear();
-        mdlCart.setRowCount(0);
-        updateTotal();
-    }
-
-    int getTotal() {
-        return cart.stream().mapToInt(c -> c.subtotal).sum();
-    }
-
-    void updateTotal() {
-        lblTotal.setText("Rp " + getTotal());
-    }
-
-    void refreshProduk() {
-        mdlProduk.setRowCount(0);
-        for (Product p : products)
-            mdlProduk.addRow(new Object[]{p.nama, p.harga});
-    }
-
-    // ================= CSV =================
-    void simpanProdukCSV() {
-        try (PrintWriter pw =
-                     new PrintWriter(new FileWriter(FILE_PRODUK))) {
-            pw.println("nama,harga");
-            for (Product p : products)
-                pw.println(p.nama + "," + p.harga);
-        } catch (Exception ignored) {}
-    }
-
-    void loadProdukCSV() {
+    private void initDummyData() {
         File f = new File(FILE_PRODUK);
-        if (!f.exists()) return;
-        try (BufferedReader br =
-                     new BufferedReader(new FileReader(f))) {
-            br.readLine();
-            String s;
-            while ((s = br.readLine()) != null) {
-                String[] d = s.split(",");
-                products.add(
-                        new Product(d[0], Integer.parseInt(d[1])));
-            }
-        } catch (Exception ignored) {}
-    }
-
-    void simpanLaporanCSV(String t, int total,
-                          String m, int b, int k) {
-        try (PrintWriter pw =
-                     new PrintWriter(new FileWriter(FILE_LAPORAN, true))) {
-            if (new File(FILE_LAPORAN).length() == 0)
-                pw.println("tanggal,total,metode,bayar,kembali");
-            pw.println(t + "," + total + "," + m + "," + b + "," + k);
-        } catch (Exception ignored) {}
-    }
-
-    void loadLaporanCSV() {
-        File f = new File(FILE_LAPORAN);
-        if (!f.exists()) return;
-        try (BufferedReader br =
-                     new BufferedReader(new FileReader(f))) {
-            br.readLine();
-            String s;
-            while ((s = br.readLine()) != null) {
-                String[] d = s.split(",");
-                mdlReport.addRow(d);
-            }
-        } catch (Exception ignored) {}
-    }
-
-    // ================= COMPONENT =================
-    JPanel cardPanel(int w, int h) {
-        JPanel p = new JPanel();
-        p.setPreferredSize(new Dimension(w, h));
-        p.setBackground(CARD);
-        p.setBorder(new EmptyBorder(16,16,16,16));
-        return p;
-    }
-
-    JTextField inputField(String hint) {
-        return new JTextField(hint);
-    }
-
-    JPasswordField passwordField() {
-        return new JPasswordField();
-    }
-
-    JButton btn(Color c, String t) {
-        JButton b = new JButton(t);
-        b.setBackground(c);
-        b.setForeground(Color.WHITE);
-        return b;
-    }
-
-    JTable styledTable(DefaultTableModel mdl) {
-        JTable t = new JTable(mdl);
-        t.setRowHeight(32);
-        t.setFont(FONT);
-        t.getTableHeader()
-                .setFont(new Font("Segoe UI", Font.BOLD, 13));
-        t.getTableHeader()
-                .setBackground(new Color(248,250,252));
-        t.setGridColor(BORDER);
-        return t;
-    }
-
-    // ================= MODEL =================
-    static class Product {
-        String nama; int harga;
-        Product(String n, int h) { nama = n; harga = h; }
-    }
-
-    static class CartItem {
-        String nama; int qty, subtotal;
-        CartItem(String n, int q, int s) {
-            nama = n; qty = q; subtotal = s;
+        if(!f.exists()) {
+            try(PrintWriter pw = new PrintWriter(f)) {
+                pw.println("Nasi Goreng Spesial,25000");
+                pw.println("Ayam Bakar Madu,30000");
+                pw.println("Es Teh Manis,5000");
+                pw.println("Kopi Latte,18000");
+                pw.println("Mie Goreng Jawa,22000");
+                pw.println("Jus Alpukat,15000");
+                pw.println("Kentang Goreng,12000");
+                pw.println("Burger Beef,35000");
+            } catch(Exception e){}
         }
     }
 
+    // ===============================================================
+    // BAGIAN A: LOGIN SCREEN (FIXED)
+    // ===============================================================
+    private JPanel initLoginScreen() {
+        JPanel root = new JPanel(new GridBagLayout());
+        root.setBackground(COL_BG_MAIN);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Judul
+        JLabel lblTitle = new JLabel("SYSTEM LOGIN");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        lblTitle.setForeground(COL_ACCENT);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        root.add(lblTitle, gbc);
+
+        // Username (Default: admin)
+        gbc.gridwidth = 1; gbc.gridy = 1;
+        root.add(new JLabel("Username:"), gbc);
+        JTextField txtUsername = new JTextField("admin", 20); // Auto-fill
+        styleInput(txtUsername);
+        gbc.gridx = 1;
+        root.add(txtUsername, gbc);
+
+        // Password (Default: admin)
+        gbc.gridx = 0; gbc.gridy = 2;
+        root.add(new JLabel("Password:"), gbc);
+        JPasswordField txtPassword = new JPasswordField("admin", 20); // Auto-fill
+        styleInput(txtPassword);
+        gbc.gridx = 1;
+        root.add(txtPassword, gbc);
+
+        // Tombol Login
+        JButton btnLogin = new JButton("MASUK APLIKASI");
+        styleButton(btnLogin, COL_ACCENT);
+        
+        // --- LOGIKA LOGIN ANTI-GAGAL ---
+        btnLogin.addActionListener(e -> {
+            String u = txtUsername.getText().trim();
+            String p = new String(txtPassword.getPassword()).trim();
+            boolean valid = false;
+
+            // Cek 1: Hardcoded Admin (Pasti berhasil)
+            if (u.equalsIgnoreCase("admin") && p.equals("admin")) {
+                valid = true;
+            } 
+            // Cek 2: Dari Data CSV
+            else {
+                for (Employee emp : employeeList) {
+                    if (emp.getUsername().equals(u) && emp.getPassword().equals(p)) {
+                        valid = true; break;
+                    }
+                }
+            }
+
+            if (valid) {
+                // Pindah ke Menu Utama
+                setContentPane(initMainLayout());
+                renderProdukGrid(""); // Render produk awal
+                revalidate();
+                repaint();
+            } else {
+                JOptionPane.showMessageDialog(this, "Login Gagal! Gunakan user: admin / pass: admin");
+            }
+        });
+        
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        root.add(btnLogin, gbc);
+
+        return root;
+    }
+
+    // ===============================================================
+    // BAGIAN B: LAYOUT UTAMA & SIDEBAR
+    // ===============================================================
+    private JPanel initMainLayout() {
+        JPanel root = new JPanel(new BorderLayout());
+        root.add(initSidebar(), BorderLayout.WEST);
+
+        // Tambahkan halaman ke CardLayout
+        contentPanel.add(initPageKasir(), "KASIR");
+        contentPanel.add(initPageProduk(), "PRODUK");
+        contentPanel.add(initPageLaporan(), "LAPORAN");
+
+        // Show default page
+        cardLayout.show(contentPanel, "KASIR");
+
+        root.add(contentPanel, BorderLayout.CENTER);
+        return root;
+    }
+
+    private JPanel initSidebar() {
+        JPanel side = new JPanel();
+        side.setBackground(COL_SIDEBAR);
+        side.setPreferredSize(new Dimension(90, 0));
+        side.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 20));
+
+        side.add(Box.createVerticalStrut(20));
+        side.add(createNavBtn("🖥️", "KASIR", "Kasir"));
+        side.add(createNavBtn("📦", "PRODUK", "Stok"));
+        side.add(createNavBtn("📊", "LAPORAN", "Data"));
+        
+        side.add(Box.createVerticalStrut(300)); 
+        
+        JButton logout = createNavBtn("🚪", "LOGOUT", "Keluar");
+        logout.setBackground(COL_DANGER);
+        logout.addActionListener(e -> {
+            if(JOptionPane.showConfirmDialog(this, "Logout dari aplikasi?", "Konfirmasi", JOptionPane.YES_NO_OPTION)==0) {
+                setContentPane(initLoginScreen());
+                revalidate();
+            }
+        });
+        side.add(logout);
+        return side;
+    }
+
+    private JButton createNavBtn(String icon, String key, String tooltip) {
+        JButton b = new JButton(icon);
+        b.setPreferredSize(new Dimension(60, 60));
+        b.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 32));
+        b.setBackground(COL_SIDEBAR);
+        b.setForeground(Color.WHITE);
+        b.setBorderPainted(false); b.setFocusPainted(false);
+        b.setToolTipText(tooltip);
+        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        if(!key.equals("LOGOUT")) {
+            b.addActionListener(e -> {
+                cardLayout.show(contentPanel, key);
+                // Refresh data saat pindah halaman
+                if(key.equals("KASIR")) { txtSearchKasir.setText(""); renderProdukGrid(""); refreshPanelCartItems(); }
+                if(key.equals("PRODUK")) { txtSearchAdmin.setText(""); refreshTableProduk(""); }
+            });
+        }
+        return b;
+    }
+
+    // ===============================================================
+    // BAGIAN C: HALAMAN KASIR
+    // ===============================================================
+    private JPanel initPageKasir() {
+        JPanel root = new JPanel(new BorderLayout());
+        root.setBackground(COL_BG_MAIN);
+
+        // -- HEADER --
+        JPanel header = new JPanel(new BorderLayout(10, 0));
+        header.setBackground(COL_BG_MAIN);
+        header.setBorder(new EmptyBorder(15, 20, 5, 20));
+        
+        txtSearchKasir = new JTextField();
+        styleInput(txtSearchKasir);
+        txtSearchKasir.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { renderProdukGrid(txtSearchKasir.getText()); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { renderProdukGrid(txtSearchKasir.getText()); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { renderProdukGrid(txtSearchKasir.getText()); }
+        });
+
+        header.add(new JLabel("<html><b>Pencarian Menu</b></html>"), BorderLayout.NORTH);
+        header.add(txtSearchKasir, BorderLayout.CENTER);
+
+        // -- GRID PRODUK (KIRI) --
+        panelProdukGrid = new JPanel(new GridLayout(0, 4, 15, 15)); // 4 Kolom
+        panelProdukGrid.setBackground(COL_BG_MAIN);
+        panelProdukGrid.setBorder(new EmptyBorder(10, 20, 20, 20));
+        
+        JScrollPane scrollGrid = new JScrollPane(panelProdukGrid);
+        scrollGrid.setBorder(null);
+        scrollGrid.getVerticalScrollBar().setUnitIncrement(16);
+
+        // -- KERANJANG BELANJA (KANAN) --
+        JPanel panelCart = new JPanel(new BorderLayout());
+        panelCart.setPreferredSize(new Dimension(400, 0));
+        panelCart.setBackground(Color.WHITE);
+        panelCart.setBorder(new MatteBorder(0, 1, 0, 0, Color.LIGHT_GRAY));
+
+        panelCartItems = new JPanel();
+        panelCartItems.setLayout(new BoxLayout(panelCartItems, BoxLayout.Y_AXIS));
+        panelCartItems.setBackground(Color.WHITE);
+
+        JScrollPane scrollCart = new JScrollPane(panelCartItems);
+        scrollCart.setBorder(null);
+        scrollCart.getVerticalScrollBar().setUnitIncrement(16);
+
+        // -- FOOTER KERANJANG --
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(Color.WHITE);
+        footer.setBorder(new EmptyBorder(15, 15, 15, 15));
+
+        lblTotalBayar = new JLabel("Rp 0", SwingConstants.RIGHT);
+        lblTotalBayar.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        lblTotalBayar.setForeground(COL_ACCENT);
+
+        JButton btnBayar = new JButton("BAYAR SEKARANG");
+        styleButton(btnBayar, COL_SUCCESS);
+        btnBayar.setPreferredSize(new Dimension(100, 45));
+        btnBayar.addActionListener(e -> actionBayar());
+
+        JButton btnReset = new JButton("Reset");
+        styleButton(btnReset, COL_DANGER);
+        btnReset.addActionListener(e -> { cartList.clear(); refreshPanelCartItems(); });
+
+        JPanel btnRow = new JPanel(new BorderLayout(10, 0));
+        btnRow.setBackground(Color.WHITE);
+        btnRow.add(btnReset, BorderLayout.WEST);
+        btnRow.add(btnBayar, BorderLayout.CENTER);
+
+        footer.add(new JLabel("Total Tagihan:"), BorderLayout.NORTH);
+        footer.add(lblTotalBayar, BorderLayout.CENTER);
+        footer.add(btnRow, BorderLayout.SOUTH);
+
+        panelCart.add(new JLabel("  Daftar Pesanan", JLabel.CENTER), BorderLayout.NORTH);
+        panelCart.add(scrollCart, BorderLayout.CENTER);
+        panelCart.add(footer, BorderLayout.SOUTH);
+
+        // -- SUSUN LAYOUT --
+        JPanel leftArea = new JPanel(new BorderLayout());
+        leftArea.setBackground(COL_BG_MAIN);
+        leftArea.add(header, BorderLayout.NORTH);
+        leftArea.add(scrollGrid, BorderLayout.CENTER);
+
+        root.add(leftArea, BorderLayout.CENTER);
+        root.add(panelCart, BorderLayout.EAST);
+        return root;
+    }
+
+    private void renderProdukGrid(String keyword) {
+        panelProdukGrid.removeAll();
+        String k = keyword.toLowerCase();
+
+        java.util.List<Product> filtered = productList.stream()
+            .filter(p -> p.getName().toLowerCase().contains(k))
+            .collect(Collectors.toList());
+
+        if (filtered.isEmpty()) {
+            JLabel empty = new JLabel("Produk tidak ditemukan.", SwingConstants.CENTER);
+            panelProdukGrid.add(empty);
+        }
+
+        for (Product p : filtered) {
+            JButton card = new JButton();
+            card.setLayout(new BorderLayout());
+            card.setBackground(Color.WHITE);
+            card.setBorder(new LineBorder(new Color(220, 220, 220), 1));
+            card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            card.setPreferredSize(new Dimension(140, 100));
+
+            String html = "<html><center>"
+                        + "<div style='font-size:12px; font-weight:bold; color:#334155; margin-bottom:5px'>" + p.getName() + "</div>"
+                        + "<div style='color:#10b981; font-size:11px'>" + formatRupiah(p.getPrice()) + "</div>"
+                        + "</center></html>";
+            card.setText(html);
+            
+            // Efek Hover
+            card.addMouseListener(new MouseAdapter() {
+                public void mouseEntered(MouseEvent e) { card.setBorder(new LineBorder(COL_ACCENT, 2)); }
+                public void mouseExited(MouseEvent e) { card.setBorder(new LineBorder(new Color(220, 220, 220), 1)); }
+            });
+            
+            card.addActionListener(e -> addToCart(p));
+            panelProdukGrid.add(card);
+        }
+        panelProdukGrid.revalidate();
+        panelProdukGrid.repaint();
+    }
+
+    private void addToCart(Product p) {
+        boolean found = false;
+        for (CartItem c : cartList) {
+            if (c.name.equals(p.getName())) {
+                c.qty++; c.subtotal = c.qty * p.getPrice();
+                found = true; break;
+            }
+        }
+        if (!found) cartList.add(new CartItem(p.getName(), 1, p.getPrice()));
+        refreshPanelCartItems();
+    }
+
+    private void refreshPanelCartItems() {
+        panelCartItems.removeAll();
+        int total = 0;
+
+        for (CartItem c : cartList) {
+            JPanel itemPanel = new JPanel(new BorderLayout());
+            itemPanel.setBackground(Color.WHITE);
+            itemPanel.setBorder(new CompoundBorder(
+                new MatteBorder(0,0,1,0, new Color(240,240,240)),
+                new EmptyBorder(10, 10, 10, 10)
+            ));
+            itemPanel.setPreferredSize(new Dimension(0, 60));
+
+            // Info Item
+            JLabel lblItem = new JLabel("<html><b style='font-size:11px'>"+c.name+"</b><br><span style='font-size:10px;color:gray'>@ " + formatRupiah(c.subtotal/c.qty) + " x " + c.qty + "</span></html>");
+            lblItem.setFont(FONT_UI);
+
+            // Subtotal
+            JLabel lblSubtotal = new JLabel(formatRupiah(c.subtotal), SwingConstants.RIGHT);
+            lblSubtotal.setFont(FONT_BOLD);
+            lblSubtotal.setForeground(COL_ACCENT);
+
+            // Tombol Hapus (X)
+            JButton btnRemove = new JButton("×");
+            btnRemove.setFont(new Font("Arial", Font.BOLD, 16));
+            btnRemove.setBackground(Color.WHITE);
+            btnRemove.setForeground(COL_DANGER);
+            btnRemove.setBorder(null);
+            btnRemove.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnRemove.setPreferredSize(new Dimension(30, 30));
+            btnRemove.addActionListener(e -> {
+                cartList.remove(c);
+                refreshPanelCartItems();
+            });
+
+            JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+            rightPanel.setBackground(Color.WHITE);
+            rightPanel.add(lblSubtotal);
+            rightPanel.add(btnRemove);
+
+            itemPanel.add(lblItem, BorderLayout.WEST);
+            itemPanel.add(rightPanel, BorderLayout.EAST);
+
+            panelCartItems.add(itemPanel);
+            total += c.subtotal;
+        }
+
+        lblTotalBayar.setText(formatRupiah(total));
+        panelCartItems.revalidate();
+        panelCartItems.repaint();
+    }
+    
+    private void actionBayar() {
+        if(cartList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Keranjang kosong!");
+            return;
+        }
+        
+        int t = cartList.stream().mapToInt(c -> c.subtotal).sum();
+        
+        // Simpan ke Laporan
+        simpanLaporan(t);
+        
+        JOptionPane.showMessageDialog(this, "Pembayaran Berhasil!\nTotal: " + formatRupiah(t));
+        cartList.clear(); 
+        refreshPanelCartItems();
+    }
+
+    // ===============================================================
+    // BAGIAN D: HALAMAN ADMIN (PRODUK)
+    // ===============================================================
+    private JPanel initPageProduk() {
+        JPanel root = new JPanel(new BorderLayout(15, 15));
+        root.setBorder(new EmptyBorder(20, 20, 20, 20));
+        root.setBackground(COL_BG_MAIN);
+
+        JPanel top = new JPanel(new BorderLayout(10, 0));
+        top.setBackground(COL_BG_MAIN);
+        
+        JLabel lbl = new JLabel("Database Produk");
+        lbl.setFont(FONT_HEADER);
+        
+        txtSearchAdmin = new JTextField();
+        styleInput(txtSearchAdmin);
+        txtSearchAdmin.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { refreshTableProduk(txtSearchAdmin.getText()); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { refreshTableProduk(txtSearchAdmin.getText()); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { refreshTableProduk(txtSearchAdmin.getText()); }
+        });
+        
+        JPanel searchWrap = new JPanel(new BorderLayout());
+        searchWrap.setBackground(COL_BG_MAIN);
+        searchWrap.add(new JLabel("Cari Barang:  "), BorderLayout.WEST);
+        searchWrap.add(txtSearchAdmin, BorderLayout.CENTER);
+        searchWrap.setPreferredSize(new Dimension(300, 35));
+
+        top.add(lbl, BorderLayout.WEST);
+        top.add(searchWrap, BorderLayout.EAST);
+
+        modelProdukAdmin = new DefaultTableModel(new String[]{"Nama Produk", "Harga Satuan"}, 0);
+        JTable tbl = new JTable(modelProdukAdmin);
+        styleTable(tbl);
+        refreshTableProduk("");
+
+        JPanel acts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        acts.setBackground(COL_BG_MAIN);
+        JButton btnAdd = new JButton("Tambah Baru"); styleButton(btnAdd, COL_ACCENT);
+        JButton btnEdit = new JButton("Edit"); styleButton(btnEdit, Color.ORANGE);
+        JButton btnDel = new JButton("Hapus"); styleButton(btnDel, COL_DANGER);
+
+        btnAdd.addActionListener(e -> crudAction("ADD", null));
+        btnEdit.addActionListener(e -> crudAction("EDIT", tbl));
+        btnDel.addActionListener(e -> crudAction("DEL", tbl));
+
+        acts.add(btnAdd); acts.add(btnEdit); acts.add(btnDel);
+
+        root.add(top, BorderLayout.NORTH);
+        root.add(new JScrollPane(tbl), BorderLayout.CENTER);
+        root.add(acts, BorderLayout.SOUTH);
+        return root;
+    }
+
+    private void refreshTableProduk(String keyword) {
+        modelProdukAdmin.setRowCount(0);
+        String k = keyword.toLowerCase();
+        for(Product p : productList) {
+            if(p.getName().toLowerCase().contains(k))
+                modelProdukAdmin.addRow(new Object[]{p.getName(), formatRupiah(p.getPrice())});
+        }
+    }
+
+    private void crudAction(String mode, JTable tbl) {
+        if(mode.equals("ADD")) {
+            JTextField n = new JTextField(); JTextField h = new JTextField();
+            Object[] message = {"Nama Produk:", n, "Harga (Angka):", h};
+            if(JOptionPane.showConfirmDialog(this, message, "Tambah Produk", JOptionPane.OK_CANCEL_OPTION)==0){
+                try {
+                    productList.add(new Product(n.getText(), Integer.parseInt(h.getText())));
+                    simpanProdukCSV(); refreshTableProduk("");
+                } catch(Exception e) { JOptionPane.showMessageDialog(this, "Harga harus berupa angka!"); }
+            }
+        } else {
+            int r = tbl.getSelectedRow();
+            if(r == -1) { JOptionPane.showMessageDialog(this, "Pilih baris produk dulu!"); return; }
+            String selectedName = (String) tbl.getValueAt(r, 0);
+            Product p = productList.stream().filter(x -> x.getName().equals(selectedName)).findFirst().orElse(null);
+            if(p == null) return;
+
+            if(mode.equals("EDIT")) {
+                JTextField n = new JTextField(p.getName()); JTextField h = new JTextField(String.valueOf(p.getPrice()));
+                Object[] message = {"Nama Produk:", n, "Harga:", h};
+                if(JOptionPane.showConfirmDialog(this, message, "Edit Produk", JOptionPane.OK_CANCEL_OPTION)==0){
+                    p.setName(n.getText()); p.setPrice(Integer.parseInt(h.getText()));
+                    simpanProdukCSV(); refreshTableProduk(txtSearchAdmin.getText());
+                }
+            } else if(mode.equals("DEL")) {
+                if(JOptionPane.showConfirmDialog(this, "Yakin hapus produk ini?")==0){
+                    productList.remove(p);
+                    simpanProdukCSV(); refreshTableProduk(txtSearchAdmin.getText());
+                }
+            }
+        }
+    }
+
+    // ===============================================================
+    // BAGIAN E: HALAMAN LAPORAN
+    // ===============================================================
+    private JPanel initPageLaporan() {
+        JPanel root = new JPanel(new BorderLayout());
+        root.setBorder(new EmptyBorder(20,20,20,20));
+        root.setBackground(COL_BG_MAIN);
+        
+        JLabel l = new JLabel("Riwayat Transaksi"); l.setFont(FONT_HEADER);
+        root.add(l, BorderLayout.NORTH);
+        
+        modelLaporan = new DefaultTableModel(new String[]{"Waktu Transaksi", "Total Pendapatan"},0);
+        JTable t = new JTable(modelLaporan);
+        styleTable(t);
+        loadLaporanCSV();
+        
+        root.add(new JScrollPane(t), BorderLayout.CENTER);
+        return root;
+    }
+
+    // ===============================================================
+    // BAGIAN F: UTILITIES & DATA HANDLING
+    // ===============================================================
+    private void styleInput(JTextField t) {
+        t.setFont(FONT_UI);
+        t.setBorder(BorderFactory.createCompoundBorder(
+            new LineBorder(Color.LIGHT_GRAY, 1, true),
+            new EmptyBorder(5, 8, 5, 8)
+        ));
+    }
+    private void styleButton(JButton b, Color c) {
+        b.setBackground(c); b.setForeground(Color.WHITE);
+        b.setFont(FONT_BOLD); b.setFocusPainted(false);
+        b.setBorderPainted(false); b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+    private void styleTable(JTable t) {
+        t.setRowHeight(30); t.setFont(FONT_UI);
+        t.getTableHeader().setFont(FONT_BOLD);
+        t.setShowVerticalLines(false);
+        t.setSelectionBackground(new Color(230, 240, 255));
+    }
+    private String formatRupiah(int v) {
+        return NumberFormat.getCurrencyInstance(new Locale("id", "ID")).format(v).replace("Rp", "Rp ");
+    }
+    
+
+
+    // --- CSV OPERATIONS ---
+    private void simpanProdukCSV() {
+        try(PrintWriter pw=new PrintWriter(FILE_PRODUK)){
+            for(Product p:productList) pw.println(p.getName()+","+p.getPrice());
+        }catch(Exception e){ e.printStackTrace(); }
+    }
+    
+    private void loadDataProduk() {
+        productList.clear();
+        try(BufferedReader br=new BufferedReader(new FileReader(FILE_PRODUK))){
+            String l; while((l=br.readLine())!=null){
+                String[] d=l.split(",");
+                if(d.length>1) productList.add(new Product(d[0],Integer.parseInt(d[1])));
+            }
+        }catch(Exception e){}
+    }
+    
+    private void loadDataEmployee() {
+        employeeList.clear();
+        // BACKDOOR: Selalu tambahkan Admin default ke Memory (bukan file)
+        employeeList.add(new Employee("admin", "admin", "Administrator"));
+        employeeList.add(new Employee("kasir", "kasir", "Kasir"));
+        
+        try(BufferedReader br=new BufferedReader(new FileReader(FILE_EMPLOYEE))){
+            String l; while((l=br.readLine())!=null){
+                String[] d=l.split(",");
+                if(d.length>2) employeeList.add(new Employee(d[0], d[1], d[2]));
+            }
+        }catch(Exception e){}
+    }
+    
+    private void simpanLaporan(int t) {
+        try(PrintWriter pw=new PrintWriter(new FileWriter(FILE_LAPORAN,true))){
+            String d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            pw.println(d+","+t); 
+            modelLaporan.addRow(new Object[]{d,formatRupiah(t)});
+        }catch(Exception e){}
+    }
+    
+    private void loadLaporanCSV() {
+        modelLaporan.setRowCount(0);
+        try(BufferedReader br=new BufferedReader(new FileReader(FILE_LAPORAN))){
+            String l; while((l=br.readLine())!=null) {
+                String[] d=l.split(","); 
+                if(d.length>1) modelLaporan.addRow(new Object[]{d[0],formatRupiah(Integer.parseInt(d[1]))});
+            }
+        }catch(Exception e){}
+    }
+
+    // --- INNER CLASSES (MODEL DATA) ---
+    static class Product { 
+        private String name; 
+        private int price;
+        public Product(String n, int p) { this.name=n; this.price=p; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public int getPrice() { return price; }
+        public void setPrice(int price) { this.price = price; }
+    }
+
+    static class Employee {
+        String username, password, role;
+        public Employee(String u, String p, String r) { username=u; password=p; role=r; }
+        public String getUsername() { return username; }
+        public String getPassword() { return password; }
+    }
+
+    static class CartItem { 
+        String name; int qty, subtotal; 
+        CartItem(String n,int q,int p){name=n;qty=q;subtotal=p;}
+    }
+
+    // --- MAIN METHOD ---
     public static void main(String[] args) {
+        // Mengaktifkan Antialiasing agar font halus
+        System.setProperty("awt.useSystemAAFontSettings","on");
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {}
+        
         SwingUtilities.invokeLater(KasirModern::new);
     }
 }
