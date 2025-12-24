@@ -1,4 +1,4 @@
-package com.kasir; // Boleh dihapus jika tidak pakai package
+package com.kasir;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -94,15 +94,21 @@ public class KasirModern extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
+        // Logo
+        JLabel lblLogo = new JLabel(LogoGenerator.createLogoIcon(120));
+        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        root.add(lblLogo, gbc);
+
         // Judul
         JLabel lblTitle = new JLabel("SYSTEM LOGIN");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(COL_ACCENT);
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2;
         root.add(lblTitle, gbc);
 
         // Username (Default: admin)
-        gbc.gridwidth = 1; gbc.gridy = 1;
+        gbc.gridwidth = 1; gbc.gridy = 2;
         root.add(new JLabel("Username:"), gbc);
         JTextField txtUsername = new JTextField("admin", 20); // Auto-fill
         styleInput(txtUsername);
@@ -110,7 +116,7 @@ public class KasirModern extends JFrame {
         root.add(txtUsername, gbc);
 
         // Password (Default: admin)
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 3;
         root.add(new JLabel("Password:"), gbc);
         JPasswordField txtPassword = new JPasswordField("admin", 20); // Auto-fill
         styleInput(txtPassword);
@@ -151,7 +157,7 @@ public class KasirModern extends JFrame {
             }
         });
         
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
         root.add(btnLogin, gbc);
 
         return root;
@@ -183,6 +189,12 @@ public class KasirModern extends JFrame {
         side.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 20));
 
         side.add(Box.createVerticalStrut(20));
+
+        // Logo kecil di sidebar
+        JLabel lblLogoSide = new JLabel(LogoGenerator.createLogoIcon(48));
+        lblLogoSide.setPreferredSize(new Dimension(60, 60));
+        side.add(lblLogoSide);
+
         side.add(createNavBtn("🖥️", "KASIR", "Kasir"));
         side.add(createNavBtn("📦", "PRODUK", "Stok"));
         side.add(createNavBtn("📊", "LAPORAN", "Data"));
@@ -204,10 +216,18 @@ public class KasirModern extends JFrame {
     private JButton createNavBtn(String icon, String key, String tooltip) {
         JButton b = new JButton(icon);
         b.setPreferredSize(new Dimension(60, 60));
-        b.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 32));
+        // Emoji kadang tidak ter-render di beberapa font/JDK, jadi pakai fallback aman.
+        Font emojiFont = new Font("Segoe UI Emoji", Font.PLAIN, 26);
+        if (emojiFont.canDisplayUpTo(icon) == -1) {
+            b.setFont(emojiFont);
+        } else {
+            b.setText(navFallbackText(key));
+            b.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        }
         b.setBackground(COL_SIDEBAR);
         b.setForeground(Color.WHITE);
         b.setBorderPainted(false); b.setFocusPainted(false);
+        b.setMargin(new Insets(0, 0, 0, 0));
         b.setToolTipText(tooltip);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
@@ -220,6 +240,17 @@ public class KasirModern extends JFrame {
             });
         }
         return b;
+    }
+
+    private String navFallbackText(String key) {
+        if (key == null) return "?";
+        return switch (key) {
+            case "KASIR" -> "K";
+            case "PRODUK" -> "P";
+            case "LAPORAN" -> "L";
+            case "LOGOUT" -> "X";
+            default -> key.substring(0, 1);
+        };
     }
 
     // ===============================================================
@@ -357,7 +388,8 @@ public class KasirModern extends JFrame {
         boolean found = false;
         for (CartItem c : cartList) {
             if (c.name.equals(p.getName())) {
-                c.qty++; c.subtotal = c.qty * p.getPrice();
+                c.qty++;
+                c.subtotal = c.qty * c.price;
                 found = true; break;
             }
         }
@@ -379,13 +411,44 @@ public class KasirModern extends JFrame {
             itemPanel.setPreferredSize(new Dimension(0, 60));
 
             // Info Item
-            JLabel lblItem = new JLabel("<html><b style='font-size:11px'>"+c.name+"</b><br><span style='font-size:10px;color:gray'>@ " + formatRupiah(c.subtotal/c.qty) + " x " + c.qty + "</span></html>");
+            JLabel lblItem = new JLabel("<html><b style='font-size:11px'>"+c.name+"</b><br><span style='font-size:10px;color:gray'>@ " + formatRupiah(c.price) + " x " + c.qty + "</span></html>");
             lblItem.setFont(FONT_UI);
 
             // Subtotal
             JLabel lblSubtotal = new JLabel(formatRupiah(c.subtotal), SwingConstants.RIGHT);
             lblSubtotal.setFont(FONT_BOLD);
             lblSubtotal.setForeground(COL_ACCENT);
+
+            // Kontrol Quantity (- / +)
+            JButton btnMinus = new JButton("−");
+            btnMinus.setFont(new Font("Arial", Font.BOLD, 18));
+            btnMinus.setBackground(Color.WHITE);
+            btnMinus.setForeground(COL_DANGER);
+            btnMinus.setBorder(null);
+            btnMinus.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnMinus.setPreferredSize(new Dimension(30, 30));
+            btnMinus.addActionListener(e -> {
+                if (c.qty <= 1) {
+                    cartList.remove(c);
+                } else {
+                    c.qty--;
+                    c.subtotal = c.qty * c.price;
+                }
+                refreshPanelCartItems();
+            });
+
+            JButton btnPlus = new JButton("+");
+            btnPlus.setFont(new Font("Arial", Font.BOLD, 16));
+            btnPlus.setBackground(Color.WHITE);
+            btnPlus.setForeground(COL_SUCCESS);
+            btnPlus.setBorder(null);
+            btnPlus.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnPlus.setPreferredSize(new Dimension(30, 30));
+            btnPlus.addActionListener(e -> {
+                c.qty++;
+                c.subtotal = c.qty * c.price;
+                refreshPanelCartItems();
+            });
 
             // Tombol Hapus (X)
             JButton btnRemove = new JButton("×");
@@ -402,6 +465,8 @@ public class KasirModern extends JFrame {
 
             JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
             rightPanel.setBackground(Color.WHITE);
+            rightPanel.add(btnMinus);
+            rightPanel.add(btnPlus);
             rightPanel.add(lblSubtotal);
             rightPanel.add(btnRemove);
 
@@ -424,13 +489,61 @@ public class KasirModern extends JFrame {
         }
         
         int t = cartList.stream().mapToInt(c -> c.subtotal).sum();
+
+        int tunai = 0;
+        while (true) {
+            String input = JOptionPane.showInputDialog(
+                this,
+                "Masukkan Uang Tunai (angka):\nTotal: " + formatRupiah(t),
+                "Pembayaran Tunai",
+                JOptionPane.QUESTION_MESSAGE
+            );
+            if (input == null) return; // cancel
+
+            Integer parsed = parseRupiahToInt(input);
+            if (parsed == null) {
+                JOptionPane.showMessageDialog(this, "Input tidak valid. Masukkan angka tunai, contoh: 50000");
+                continue;
+            }
+            tunai = parsed;
+            if (tunai < t) {
+                JOptionPane.showMessageDialog(this, "Uang tunai kurang!\nKurang: " + formatRupiah(t - tunai));
+                continue;
+            }
+            break;
+        }
+
+        int kembalian = tunai - t;
         
         // Simpan ke Laporan
         simpanLaporan(t);
         
-        JOptionPane.showMessageDialog(this, "Pembayaran Berhasil!\nTotal: " + formatRupiah(t));
+        JOptionPane.showMessageDialog(
+            this,
+            "Pembayaran Berhasil!\n" +
+            "Total: " + formatRupiah(t) + "\n" +
+            "Tunai: " + formatRupiah(tunai) + "\n" +
+            "Kembalian: " + formatRupiah(kembalian)
+        );
         cartList.clear(); 
         refreshPanelCartItems();
+    }
+
+    private Integer parseRupiahToInt(String input) {
+        if (input == null) return null;
+        String cleaned = input
+            .replace("Rp", "")
+            .replace("rp", "")
+            .replaceAll("[^0-9]", "")
+            .trim();
+        if (cleaned.isEmpty()) return null;
+        try {
+            long v = Long.parseLong(cleaned);
+            if (v < 0 || v > Integer.MAX_VALUE) return null;
+            return (int) v;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     // ===============================================================
@@ -647,8 +760,8 @@ public class KasirModern extends JFrame {
     }
 
     static class CartItem { 
-        String name; int qty, subtotal; 
-        CartItem(String n,int q,int p){name=n;qty=q;subtotal=p;}
+        String name; int qty, price, subtotal; 
+        CartItem(String n,int q,int p){name=n;qty=q;price=p;subtotal=q*p;}
     }
 
     // --- MAIN METHOD ---
