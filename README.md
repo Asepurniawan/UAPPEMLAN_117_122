@@ -1,155 +1,78 @@
-🧾 Aplikasi Kasir Modern (Java Swing)
+# 🛒 Aplikasi Kasir Modern (Point of Sale)
 
-Aplikasi Kasir Modern berbasis Java Swing dengan tampilan UI modern, fitur lengkap kasir dan admin, serta penyimpanan data menggunakan file CSV (tanpa database). Cocok untuk pembelajaran GUI Java, CRUD, dan simulasi sistem kasir desktop.
+Aplikasi Desktop berbasis **Java Swing** yang dirancang untuk manajemen transaksi penjualan sederhana (studi kasus: Supermarket UMM). Aplikasi ini dibangun dengan antarmuka (GUI) yang modern, bersih, dan user-friendly tanpa memerlukan database eksternal yang rumit (menggunakan CSV).
 
-✨ Fitur Utama
-🔐 Login System
+## ✨ Fitur Utama
 
-Login Admin default
+* **Modern User Interface (GUI):** Tampilan bersih menggunakan *Flat Design* dengan palet warna profesional.
+* **Database Ringan (CSV):** Data produk, karyawan, dan laporan tersimpan dalam file `.csv`, sehingga aplikasi bersifat *portable* (bisa dipindah-pindah tanpa install MySQL).
+* **Sistem Login:** Autentikasi pengguna untuk keamanan akses (Admin & Kasir).
+* **Manajemen Produk (CRUD):** Admin dapat Menambah, Mengedit, dan Menghapus data barang.
+* **Transaksi Real-time:**
+    * Pencarian barang *Live Search* (ketik langsung muncul).
+    * Kalkulasi otomatis total belanja dan kembalian.
+    * Keranjang belanja interaktif (tambah/kurang qty).
+* **Laporan Penjualan:** Mencatat riwayat transaksi secara otomatis ke dalam log.
+* **Auto-Generated Logo:** Logo aplikasi dibuat secara programatis menggunakan Java 2D Graphics (tidak perlu load gambar eksternal).
 
-username: admin
-password: admin
+## 🛠️ Teknologi yang Digunakan
 
+* **Bahasa:** Java (JDK 8 atau lebih baru).
+* **GUI Library:** Java Swing & AWT.
+* **Penyimpanan Data:** CSV (Comma Separated Values).
+* **Konsep:** OOP (Object Oriented Programming), File Handling, 2D Graphics.
 
-Login karyawan dari file employee.csv
+## 🚀 Cara Menjalankan Aplikasi
 
-Validasi login anti-gagal (aman untuk demo)
+### Persyaratan
+Pastikan PC/Laptop Anda sudah terinstal **Java Development Kit (JDK)** minimal versi 8.
 
-🖥️ Halaman Kasir
+### Langkah-langkah
+1.  **Download/Clone** repository ini.
+2.  Buka project menggunakan IDE favorit Anda (NetBeans, IntelliJ IDEA, Eclipse, atau VS Code).
+3.  Pastikan struktur package sesuai (`package com.kasir;`).
+4.  Jalankan file **`KasirModern.java`**.
+5.  Aplikasi akan otomatis membuat file dummy (`produk.csv`) dan folder aset jika belum ada.
 
-Pencarian produk real-time
+### 🔑 Akun Login Default
+Gunakan akun berikut untuk masuk pertama kali:
 
-Tampilan produk berbentuk card/grid
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin` | `admin` |
 
-Keranjang belanja:
+*(Anda juga bisa menambahkan user lain melalui file `employee.csv`)*
 
-Tambah / kurang jumlah
+## 📂 Struktur File & Penjelasan
 
-Hapus item
+Berikut adalah penjelasan singkat mengenai fungsi setiap file dalam proyek ini:
 
-Hitung total otomatis
+### 1. `KasirModern.java` (Main Class)
+Ini adalah jantung aplikasi. File ini menangani:
+* **Entry Point:** `public static void main` ada di sini.
+* **UI Management:** Mengatur layout, sidebar, dan pergantian halaman (Login, Kasir, Produk, Laporan).
+* **Logic Transaksi:** Menangani logika keranjang belanja, hitung total, dan pembayaran.
+* **Inner Data Models:** Mendefinisikan class `Product` dan `Employee` secara internal untuk efisiensi akses UI.
 
-Pembayaran tunai
+### 2. `LogoGenerator.java`
+Utility unik untuk menggambar logo "UMM Supermarket" secara coding (menggunakan koordinat dan bentuk geometri).
+* Menghasilkan `ImageIcon` untuk header aplikasi.
+* Bisa men-generate file fisik `assets/logo.png`.
 
-Hitung kembalian otomatis
+### 3. `DataManager.java`
+Helper class untuk manajemen file.
+* Membaca dan menulis data ke file `.csv`.
+* Parsing format CSV agar data produk dapat dibaca oleh program.
 
-Simpan transaksi ke laporan
+### 4. `Product.java` & `Employee.java`
+Class model (POJO) yang merepresentasikan objek Barang dan Karyawan. Berisi atribut (seperti nama, harga, stok) serta method *Getter* dan *Setter*.
 
-Jam live real-time di sidebar
+## 📸 Preview Aplikasi
 
-📦 Halaman Admin Produk
+* **Halaman Login:** Desain minimalis dengan validasi user.
+* **Dashboard Kasir:** Grid produk di kiri, keranjang belanja di kanan.
+* **Manajemen Stok:** Tabel data barang dengan fitur pencarian dan tombol aksi (Add/Edit/Delete).
 
-Tabel produk
-
-CRUD Produk:
-
-Tambah
-
-Edit
-
-Hapus
-
-Pencarian produk
-
-Data tersimpan otomatis ke produk.csv
-
-📊 Halaman Laporan
-
-Riwayat transaksi
-
-Menampilkan:
-
-Waktu transaksi
-
-Total pendapatan
-
-Data diambil dari laporan.csv
-
-🧠 Teknologi yang Digunakan
-
-Java SE
-
-Java Swing (GUI)
-
-AWT
-
-CSV File Storage
-
-CardLayout
-
-Stream API
-
-OOP (Object-Oriented Programming)
-
-📂 Struktur File
-📁 project/
-│
-├── KasirModern.java        # Class utama aplikasi
-├── produk.csv              # Data produk
-├── laporan.csv             # Data transaksi
-├── employee.csv            # Data login karyawan
-│
-└── README.md               # Dokumentasi proyek
-
-🚀 Cara Menjalankan Aplikasi
-1️⃣ Compile
-javac KasirModern.java
-
-2️⃣ Run
-java KasirModern
-
-
-⚠️ Pastikan semua file .csv berada di folder yang sama dengan file .java
-
-🧪 Data Default Otomatis
-
-Saat pertama kali dijalankan:
-
-Jika produk.csv belum ada, aplikasi akan membuat data dummy otomatis
-
-Admin default selalu tersedia, meskipun file employee kosong
-
-🧩 Penjelasan Arsitektur Singkat
-
-KasirModern
-JFrame utama + pengatur seluruh halaman
-
-CardLayout
-Mengatur perpindahan halaman:
-
-Kasir
-
-Produk
-
-Laporan
-
-Inner Class
-
-Product → data barang
-
-Employee → data login
-
-CartItem → item keranjang
-
-CSV Handling
-
-Tanpa database
-
-Mudah dipahami & diedit manual
-
-📸 Tampilan Aplikasi
-
-UI modern (warna soft, layout rapi)
-
-Sidebar navigasi icon
-
-Tampilan responsif desktop
-
-👨‍💻 Author
-
-Gilang Saputra
-Asep Kurniawan
-
-📄 Lisensi
-
-Project ini dibuat untuk tujuan pembelajaran dan bebas dikembangkan lebih lanjut.
+---
+**Catatan Pengembang:**
+Aplikasi ini dibuat untuk tujuan edukasi/tugas kuliah. Data tersimpan dalam format teks (CSV), sehingga sangat mudah untuk dibaca atau diedit secara manual melalui Excel/Notepad jika diperlukan.
