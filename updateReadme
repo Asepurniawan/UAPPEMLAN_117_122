@@ -76,3 +76,12 @@ Class model (POJO) yang merepresentasikan objek Barang dan Karyawan. Berisi atri
 ---
 **Catatan Pengembang:**
 Aplikasi ini dibuat untuk tujuan edukasi/tugas kuliah. Data tersimpan dalam format teks (CSV), sehingga sangat mudah untuk dibaca atau diedit secara manual melalui Excel/Notepad jika diperlukan.
+
+## 👥 Identitas Pengembang (Author)
+
+Proyek ini disusun untuk memenuhi tugas pemrograman oleh:
+
+* **Gilang Saputra**
+    * NIM: `20241037011011`
+* **Asep Kurniawan**
+    * NIM: `202410370110122`
