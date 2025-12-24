@@ -1,6 +1,6 @@
 # 🛒 Aplikasi Kasir Modern (Point of Sale)
 
-Aplikasi Desktop berbasis **Java Swing** yang dirancang untuk manajemen transaksi penjualan sederhana (studi kasus: Supermarket UMM). Aplikasi ini dibangun dengan antarmuka (GUI) yang modern, bersih, dan user-friendly tanpa memerlukan database eksternal yang rumit (menggunakan CSV).
+Aplikasi Desktop berbasis **Java Swing** yang dirancang untuk manajemen transaksi penjualan sederhana (studi kasus: Supermarket UMM). Aplikasi ini dibangun dengan antarmuka (GUI) yang modern, bersih, dan *user-friendly* tanpa memerlukan database eksternal yang rumit (menggunakan penyimpanan file CSV).
 
 ## ✨ Fitur Utama
 
@@ -19,8 +19,8 @@ Aplikasi Desktop berbasis **Java Swing** yang dirancang untuk manajemen transaks
 
 * **Bahasa:** Java (JDK 8 atau lebih baru).
 * **GUI Library:** Java Swing & AWT.
-* **Penyimpanan Data:** CSV (Comma Separated Values).
-* **Konsep:** OOP (Object Oriented Programming), File Handling, 2D Graphics.
+* **Penyimpanan Data:** CSV (*Comma Separated Values*).
+* **Konsep:** OOP (*Object Oriented Programming*), File Handling, 2D Graphics.
 
 ## 🚀 Cara Menjalankan Aplikasi
 
@@ -67,15 +67,7 @@ Helper class untuk manajemen file.
 ### 4. `Product.java` & `Employee.java`
 Class model (POJO) yang merepresentasikan objek Barang dan Karyawan. Berisi atribut (seperti nama, harga, stok) serta method *Getter* dan *Setter*.
 
-## 📸 Preview Aplikasi
-
-* **Halaman Login:** Desain minimalis dengan validasi user.
-* **Dashboard Kasir:** Grid produk di kiri, keranjang belanja di kanan.
-* **Manajemen Stok:** Tabel data barang dengan fitur pencarian dan tombol aksi (Add/Edit/Delete).
-
 ---
-**Catatan Pengembang:**
-Aplikasi ini dibuat untuk tujuan edukasi/tugas kuliah. Data tersimpan dalam format teks (CSV), sehingga sangat mudah untuk dibaca atau diedit secara manual melalui Excel/Notepad jika diperlukan.
 
 ## 👥 Identitas Pengembang (Author)
 
@@ -85,3 +77,6 @@ Proyek ini disusun untuk memenuhi tugas pemrograman oleh:
     * NIM: `20241037011011`
 * **Asep Kurniawan**
     * NIM: `202410370110122`
+
+---
+&copy; 2025 Supermarket UMM Project.
