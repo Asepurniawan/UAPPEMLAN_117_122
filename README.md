@@ -1,0 +1,82 @@
+# 🛒 Aplikasi Kasir Modern (Point of Sale)
+
+Aplikasi Desktop berbasis **Java Swing** yang dirancang untuk manajemen transaksi penjualan sederhana (studi kasus: Supermarket UMM). Aplikasi ini dibangun dengan antarmuka (GUI) yang modern, bersih, dan *user-friendly* tanpa memerlukan database eksternal yang rumit (menggunakan penyimpanan file CSV).
+
+## ✨ Fitur Utama
+
+* **Modern User Interface (GUI):** Tampilan bersih menggunakan *Flat Design* dengan palet warna profesional.
+* **Database Ringan (CSV):** Data produk, karyawan, dan laporan tersimpan dalam file `.csv`, sehingga aplikasi bersifat *portable* (bisa dipindah-pindah tanpa install MySQL).
+* **Sistem Login:** Autentikasi pengguna untuk keamanan akses (Admin & Kasir).
+* **Manajemen Produk (CRUD):** Admin dapat Menambah, Mengedit, dan Menghapus data barang.
+* **Transaksi Real-time:**
+    * Pencarian barang *Live Search* (ketik langsung muncul).
+    * Kalkulasi otomatis total belanja dan kembalian.
+    * Keranjang belanja interaktif (tambah/kurang qty).
+* **Laporan Penjualan:** Mencatat riwayat transaksi secara otomatis ke dalam log.
+* **Auto-Generated Logo:** Logo aplikasi dibuat secara programatis menggunakan Java 2D Graphics (tidak perlu load gambar eksternal).
+
+## 🛠️ Teknologi yang Digunakan
+
+* **Bahasa:** Java (JDK 8 atau lebih baru).
+* **GUI Library:** Java Swing & AWT.
+* **Penyimpanan Data:** CSV (*Comma Separated Values*).
+* **Konsep:** OOP (*Object Oriented Programming*), File Handling, 2D Graphics.
+
+## 🚀 Cara Menjalankan Aplikasi
+
+### Persyaratan
+Pastikan PC/Laptop Anda sudah terinstal **Java Development Kit (JDK)** minimal versi 8.
+
+### Langkah-langkah
+1.  **Download/Clone** repository ini.
+2.  Buka project menggunakan IDE favorit Anda (NetBeans, IntelliJ IDEA, Eclipse, atau VS Code).
+3.  Pastikan struktur package sesuai (`package com.kasir;`).
+4.  Jalankan file **`KasirModern.java`**.
+5.  Aplikasi akan otomatis membuat file dummy (`produk.csv`) dan folder aset jika belum ada.
+
+### 🔑 Akun Login Default
+Gunakan akun berikut untuk masuk pertama kali:
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin` | `admin` |
+
+*(Anda juga bisa menambahkan user lain melalui file `employee.csv`)*
+
+## 📂 Struktur File & Penjelasan
+
+Berikut adalah penjelasan singkat mengenai fungsi setiap file dalam proyek ini:
+
+### 1. `KasirModern.java` (Main Class)
+Ini adalah jantung aplikasi. File ini menangani:
+* **Entry Point:** `public static void main` ada di sini.
+* **UI Management:** Mengatur layout, sidebar, dan pergantian halaman (Login, Kasir, Produk, Laporan).
+* **Logic Transaksi:** Menangani logika keranjang belanja, hitung total, dan pembayaran.
+* **Inner Data Models:** Mendefinisikan class `Product` dan `Employee` secara internal untuk efisiensi akses UI.
+
+### 2. `LogoGenerator.java`
+Utility unik untuk menggambar logo "UMM Supermarket" secara coding (menggunakan koordinat dan bentuk geometri).
+* Menghasilkan `ImageIcon` untuk header aplikasi.
+* Bisa men-generate file fisik `assets/logo.png`.
+
+### 3. `DataManager.java`
+Helper class untuk manajemen file.
+* Membaca dan menulis data ke file `.csv`.
+* Parsing format CSV agar data produk dapat dibaca oleh program.
+
+### 4. `Product.java` & `Employee.java`
+Class model (POJO) yang merepresentasikan objek Barang dan Karyawan. Berisi atribut (seperti nama, harga, stok) serta method *Getter* dan *Setter*.
+
+---
+
+## 👥 Identitas Pengembang (Author)
+
+Proyek ini disusun untuk memenuhi tugas pemrograman oleh:
+
+* **Gilang Saputra**
+    * NIM: `20241037011011`
+* **Asep Kurniawan**
+    * NIM: `202410370110122`
+
+---
+&copy; 2025 Supermarket UMM Project.
