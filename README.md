@@ -74,7 +74,7 @@ Class model (POJO) yang merepresentasikan objek Barang dan Karyawan. Berisi atri
 Proyek ini disusun untuk memenuhi tugas pemrograman oleh:
 
 * **Gilang Saputra**
-    * NIM: `20241037011011`
+    * NIM: `202410370110117`
 * **Asep Kurniawan**
     * NIM: `202410370110122`
 
